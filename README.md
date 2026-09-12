@@ -125,6 +125,36 @@ This project is deployed as a standard Next.js Node application. A Dockerfile is
 7. Schedule `POST /api/cron/release-seat-holds` with `Authorization: Bearer <CRON_SECRET>` using the host scheduler or an external cron service.
 8. Verify auth, booking, payment, and ticket delivery end to end.
 
+## Render Deployment
+
+This repository now includes `render.yaml` for Render Blueprint deploys.
+
+1. In Render, choose New + Blueprint and select this repository.
+2. Render will create:
+   - `cinebook-web` (Node web service)
+   - `cinebook-release-seat-holds` (cron service)
+3. Set environment variables on the web service:
+   - `NEXTAUTH_URL` (your Render app URL)
+   - `NEXTAUTH_SECRET`
+   - `DATABASE_URL`
+   - `DATABASE_URL_MIGRATION`
+   - `STRIPE_SECRET_KEY`
+   - `STRIPE_WEBHOOK_SECRET`
+   - `CRON_SECRET`
+4. Set environment variables on the cron service:
+   - `APP_BASE_URL` (same public URL as `NEXTAUTH_URL`)
+   - `CRON_SECRET` (same value as web service)
+5. Run migrations after the first deploy:
+   - `npm run db:migrate`
+6. Optional seed for demo data:
+   - `npm run db:seed`
+7. Point Stripe webhook to:
+   - `/api/payments/webhook`
+
+Manual cron test command:
+
+- `npm run cron:release-seat-holds`
+
 ## Security Notes
 
 - No database or payment secrets are exposed to browser code.

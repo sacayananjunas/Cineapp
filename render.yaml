@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: cinebook-web
+    env: node
+    plan: free
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: NEXTAUTH_URL
+        sync: false
+      - key: NEXTAUTH_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_URL_MIGRATION
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: CRON_SECRET
+        sync: false
+
+  - type: cron
+    name: cinebook-release-seat-holds
+    env: node
+    schedule: "*/2 * * * *"
+    buildCommand: npm ci
+    startCommand: node scripts/release-seat-holds-cron.mjs
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: APP_BASE_URL
+        sync: false
+      - key: CRON_SECRET
+        sync: false
