@@ -10,7 +10,7 @@ Production-ready cinema ticket booking app built with Next.js App Router, TypeSc
 - Drizzle ORM + SQL migrations
 - NextAuth credentials authentication
 - Stripe Checkout in test mode
-- Vercel Functions (route handlers)
+- Node.js route handlers
 
 ## Features
 
@@ -111,20 +111,19 @@ Critical scenarios include:
 - Hold expiration and cleanup idempotency
 - Stripe success/failure/cancel/retry webhook handling
 
-## Vercel Deployment
+## Non-Vercel Deployment
 
-1. Import project into Vercel.
-2. Provision Neon PostgreSQL from Vercel Marketplace.
-3. Configure preview and production env vars separately.
-4. Use pooled DATABASE_URL for runtime requests.
-5. Keep migration credentials server-side only.
-6. Run migrations during deployment pipeline before traffic cutover.
-7. Configure Stripe webhook endpoint to:
-   /api/payments/webhook
-8. Configure a Vercel Cron to call:
-   /api/cron/release-seat-holds
-   with Authorization Bearer token using CRON_SECRET.
-9. Validate preview and production end-to-end booking flow.
+This project is deployed as a standard Next.js Node application. A Dockerfile is included so it can run on hosts such as Render, Railway, Fly.io, or a VPS/container platform.
+
+1. Build the app with `npm run build`.
+2. Start it with `npm start`.
+3. Set the production environment variables on the host.
+4. Point the public URL to your chosen domain.
+5. Configure the Stripe webhook endpoint to:
+   `/api/payments/webhook`
+6. Run migrations before traffic reaches the new deployment.
+7. Schedule `POST /api/cron/release-seat-holds` with `Authorization: Bearer <CRON_SECRET>` using the host scheduler or an external cron service.
+8. Verify auth, booking, payment, and ticket delivery end to end.
 
 ## Security Notes
 
